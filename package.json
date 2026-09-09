@@ -1,0 +1,49 @@
+{
+  "name": "nodewave-delivery-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot src/index.ts",
+    "start": "bun src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "test": "vitest run",
+    "hooks:install": "husky",
+    "commitlint": "commitlint --from HEAD~1 --to HEAD",
+    "db:generate": "bunx --bun prisma generate",
+    "db:migrate": "bunx --bun prisma migrate dev",
+    "db:deploy": "bunx --bun prisma migrate deploy",
+    "db:seed": "bunx --bun prisma db seed",
+    "db:studio": "bunx --bun prisma studio"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.7.3",
+    "@nodewave/prisma-ezfilter": "^0.2.1",
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.2",
+    "hono": "^4.9.8",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
+    "@biomejs/biome": "^2.2.2",
+    "@types/bun": "latest",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/pg": "^8.15.5",
+    "husky": "^9.1.7",
+    "prisma": "^7.10.0",
+    "typescript": "^5.9.2",
+    "vitest": "^4.1.11"
+  },
+  "overrides": {
+    "deepmerge-ts": "8.0.2",
+    "mysql2": "3.24.4"
+  }
+}

@@ -1,0 +1,13 @@
+node_modules
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+coverage
+dist
+*.log
+*.tsbuildinfo
+src/generated
+package-lock.json
+
