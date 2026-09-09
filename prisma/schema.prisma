@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  PRODUCT_MANAGER
+  INTERNAL_TEAM
+  CLIENT_GUEST
+}
+
+enum Department {
+  PRODUCT
+  UI_UX
+  FRONTEND
+  BACKEND
+  CLIENT
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+model User {
+  id              String          @id @default(cuid())
+  email           String          @unique
+  passwordHash    String
+  name            String
+  avatarUrl       String?
+  role            Role
+  department      Department
+  clientProjectId String?
+  clientProject   Project?        @relation("ClientProject", fields: [clientProjectId], references: [id])
+  memberships     ProjectMember[]
+  assignedTasks   Task[]          @relation("TaskAssignee")
+  createdTasks    Task[]          @relation("TaskCreator")
+  attachments     Attachment[]
+  comments        Comment[]
+  auditLogs       AuditLog[]
+  sessions        Session[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  deletedAt       DateTime?
+
+  @@index([clientProjectId])
+  @@index([role, deletedAt])
+}
+
+model Project {
+  id          String          @id @default(cuid())
+  name        String
+  description String
+  accessCode  String          @unique
+  members     ProjectMember[]
+  clients     User[]          @relation("ClientProject")
+  tasks       Task[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  deletedAt   DateTime?
+
+  @@index([deletedAt])
+}
+
+model ProjectMember {
+  id         String     @id @default(cuid())
+  projectId  String
+  userId     String
+  project    Project    @relation(fields: [projectId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+  createdAt  DateTime   @default(now())
+  deletedAt  DateTime?
+
+  @@unique([projectId, userId])
+  @@index([userId, deletedAt])
+}
+
+model Task {
+  id           String           @id @default(cuid())
+  projectId    String
+  project      Project          @relation(fields: [projectId], references: [id])
+  title        String
+  description  String
+  status       TaskStatus       @default(TODO)
+  department   Department
+  assigneeId   String?
+  assignee     User?            @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  createdById  String
+  createdBy    User             @relation("TaskCreator", fields: [createdById], references: [id])
+  clientVisible Boolean         @default(false)
+  dueDate      DateTime?
+  version      Int              @default(1)
+  prerequisites TaskDependency[] @relation("DependentTask")
+  dependents    TaskDependency[] @relation("PrerequisiteTask")
+  attachments  Attachment[]
+  comments     Comment[]
+  auditLogs    AuditLog[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  deletedAt    DateTime?
+
+  @@index([projectId, status, deletedAt])
+  @@index([assigneeId, deletedAt])
+  @@index([department, deletedAt])
+}
+
+model TaskDependency {
+  id                 String   @id @default(cuid())
+  taskId             String
+  prerequisiteTaskId String
+  task               Task     @relation("DependentTask", fields: [taskId], references: [id])
+  prerequisiteTask   Task     @relation("PrerequisiteTask", fields: [prerequisiteTaskId], references: [id])
+  createdAt          DateTime @default(now())
+  deletedAt          DateTime?
+
+  @@unique([taskId, prerequisiteTaskId])
+  @@index([prerequisiteTaskId, deletedAt])
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  fileName  String
+  fileUrl   String
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+
+  @@index([taskId, deletedAt])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@index([taskId, deletedAt])
+}
+
+model AuditLog {
+  id            String   @id @default(cuid())
+  taskId        String
+  task          Task     @relation(fields: [taskId], references: [id])
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  changedColumn String
+  oldValue      Json?
+  newValue      Json?
+  createdAt     DateTime @default(now())
+
+  @@index([taskId, createdAt])
+  @@index([createdAt])
+}
+
+model Session {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, revokedAt])
+}
+
