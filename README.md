@@ -4,12 +4,12 @@ Backend API for a delivery management system with role and attribute based
 access control, dependency aware task states, optimistic locking, immutable
 audit logs, soft deletes, and strict client tenant isolation.
 
-- **Live API:** `<RAILWAY_BACKEND_URL>`
-- **Health check:** `<RAILWAY_BACKEND_URL>/health`
+- **Live API:** `https://nodewave-delivery-api-production-f2a6.up.railway.app/`
+- **Health check:** `https://nodewave-delivery-api-production-f2a6.up.railway.app//health`
 - **Frontend repository:**
   [DanielRidho/nodewave-delivery-web](https://github.com/DanielRidho/nodewave-delivery-web)
 
-Replace `<RAILWAY_BACKEND_URL>` with the generated Railway domain after
+Replace `https://nodewave-delivery-api-production-f2a6.up.railway.app/` with the generated Railway domain after
 deployment. Do not add `/api` to the health check URL; API resources use the
 `/api` prefix.
 
